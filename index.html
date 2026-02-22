@@ -17,13 +17,13 @@ html,body{
 
 /* === Layout === */
 #app{display:flex;flex-direction:column;height:100%;padding-top:env(safe-area-inset-top)}
-
-/* === Screens === */
 .screen{display:none;flex-direction:column;flex:1;min-height:0}
 .screen.visible{display:flex}
 #startScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 24px}
 
 /* === Start Screen === */
+.start-title{color:#445;font-size:11px;margin-bottom:6px;letter-spacing:2px;font-weight:600}
+.start-sub{color:#334;font-size:10px;margin-bottom:24px;text-align:center;line-height:1.6;max-width:280px}
 .start-btn{
   width:130px;height:130px;border-radius:65px;
   background:#131630;border:2px solid #4f8cff40;
@@ -37,75 +37,83 @@ html,body{
 .start-hint{color:#445;font-size:12px;margin-top:24px;text-align:center;line-height:1.7}
 .error-msg{color:#e74c3c;font-size:13px;margin-top:16px;text-align:center;line-height:1.6}
 
-/* === Scene Select === */
-.scene-header{text-align:center;padding:20px 16px 12px;font-size:13px;font-weight:600;color:#667;letter-spacing:2px;flex-shrink:0}
-.scene-list{flex:1;overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch}
-.scene-card{
-  background:#161929;border-radius:14px;padding:18px 20px;margin-bottom:10px;
-  cursor:pointer;transition:all .15s;border:1.5px solid #1e2140;
-}
-.scene-card:active{transform:scale(.97);border-color:#4f8cff60}
-.scene-card .sc-title{font-size:17px;font-weight:700;margin-bottom:4px}
-.scene-card .sc-sub{font-size:12px;color:#667;line-height:1.5}
-.scene-card .sc-icon{float:right;font-size:28px;margin:-2px 0 0 12px;opacity:.7}
-
-/* === Main Tuner Screen === */
+/* === Header === */
 .header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 16px;flex-shrink:0;
+  padding:8px 16px;flex-shrink:0;
 }
-.header .h-scene{font-size:14px;font-weight:600;color:#99a}
-.header .h-back{
-  background:none;border:none;color:#4f8cff;font-size:13px;font-weight:500;
-  cursor:pointer;font-family:inherit;padding:4px 8px;
-}
+.header .h-title{font-size:14px;font-weight:600;color:#667;letter-spacing:.3px}
 .header .h-settings{
-  background:none;border:none;color:#667;font-size:20px;
+  background:none;border:none;color:#556;font-size:20px;
   cursor:pointer;font-family:inherit;padding:4px 8px;
 }
-.content{flex:1;overflow-y:auto;padding:8px 16px 8px;-webkit-overflow-scrolling:touch}
+
+/* === Mode Toggle === */
+.mode-row{
+  display:flex;gap:0;margin:0 16px 8px;
+  background:#12152a;border-radius:12px;overflow:hidden;
+  border:1px solid #1e2140;
+}
+.mode-btn{
+  flex:1;padding:10px 4px;text-align:center;
+  font-size:12px;font-weight:600;color:#445;
+  background:none;border:none;cursor:pointer;
+  font-family:inherit;transition:all .15s;
+  line-height:1.3;
+}
+.mode-btn .mode-label{display:block;font-size:14px;margin-bottom:1px}
+.mode-btn .mode-sub{display:block;font-size:9px;font-weight:400;opacity:.6}
+.mode-btn.active{color:#fff}
+.mode-btn[data-mode="melody"].active{background:#4f8cff22;color:#4f8cff}
+.mode-btn[data-mode="piano"].active{background:#99a2;color:#aab}
+.mode-btn[data-mode="chord"].active{background:#f5a62322;color:#f5a623}
+
+/* === Content === */
+.content{flex:1;overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch}
 
 /* === Card === */
-.card{background:#161929;border-radius:14px;padding:18px;margin-bottom:10px}
+.card{background:#161929;border-radius:14px;padding:16px;margin-bottom:8px}
+
+/* === Judgment === */
+.judgment{text-align:center;margin-bottom:8px}
+.judgment-text{font-size:20px;font-weight:700;line-height:1.3}
+.judgment-sub{font-size:13px;color:#778;margin-top:4px;font-weight:500}
+.j-green{color:#2ecc71}
+.j-yellow{color:#f5a623}
+.j-red{color:#e74c3c}
+.j-silent{color:#445}
 
 /* === Zone Bar === */
 #zoneCanvas{display:block;margin:0 auto}
 
 /* === Note Display === */
-.note-display{text-align:center;padding:8px 0}
+.note-display{text-align:center}
 .note-kana{font-size:48px;font-weight:800;line-height:1.1}
-.note-name{font-size:14px;color:#778;margin-top:4px}
+.note-sci{font-size:14px;color:#556;margin-top:2px}
 .note-interval{font-size:15px;color:#99a;margin-top:8px;font-weight:500}
-.note-cents-row{display:flex;justify-content:center;gap:16px;margin-top:10px;flex-wrap:wrap}
-.note-cent-item{font-size:12px;color:#556;text-align:center}
-.note-cent-item .cv{font-size:14px;font-weight:600;display:block;margin-top:2px}
-.no-sound{color:#445;font-size:16px;text-align:center;padding:30px 0}
+.note-interval .ni-name{color:#ccd}
+.note-interval .ni-str{color:#667}
+.ref-row{display:flex;justify-content:center;gap:14px;margin-top:10px}
+.ref-item{text-align:center;font-size:11px;line-height:1.4}
+.ref-item .ri-label{color:#445;display:block}
+.ref-item .ri-val{font-size:14px;font-weight:600;display:block;margin-top:1px}
+.ref-item.active .ri-val{font-weight:800}
+.no-sound{color:#445;font-size:16px;text-align:center;padding:28px 0}
 
 /* === Staff === */
 #staffCanvas{display:block;margin:0 auto}
 
-/* === Melody/Chord Toggle === */
-.toggle-row{
-  display:flex;align-items:center;justify-content:center;gap:12px;
-  padding:10px 0;
-}
-.toggle-btn{
-  padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;
-  border:1.5px solid #2a2d48;background:#12152a;color:#556;
-  cursor:pointer;font-family:inherit;transition:all .15s;
-}
-.toggle-btn.active{border-color:#4f8cff;background:#4f8cff18;color:#4f8cff}
-
 /* === Learning Card === */
 .learn-card{
   background:#1a1e35;border-radius:12px;padding:14px 18px;margin-top:8px;
-  font-size:13px;color:#aab;line-height:1.6;
+  font-size:13px;color:#aab;line-height:1.7;
   border-left:3px solid #4f8cff;
-  transition:opacity .4s;
+  transition:opacity .5s;
 }
+.learn-card .lc-title{font-size:11px;color:#4f8cff;font-weight:600;margin-bottom:4px;letter-spacing:.5px}
 .learn-card.fade-out{opacity:0}
 
-/* === Settings Screen === */
+/* === Settings === */
 .settings-back{
   display:flex;align-items:center;gap:6px;
   background:none;border:none;color:#4f8cff;font-size:14px;font-weight:500;
@@ -145,7 +153,8 @@ html,body{
 
   <!-- Start Screen -->
   <div id="startScreen">
-    <div style="color:#445;font-size:11px;margin-bottom:20px;letter-spacing:2px;font-weight:600">PRO INTONATION TUNER</div>
+    <div class="start-title">PRO INTONATION TUNER</div>
+    <div class="start-sub">音は数学。プロの音程は計算で再現できる。</div>
     <button class="start-btn" id="startBtn">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" fill="#4f8cff"/>
@@ -157,71 +166,57 @@ html,body{
     <p class="error-msg" id="errorMsg" style="display:none"></p>
   </div>
 
-  <!-- Scene Select Screen -->
-  <div class="screen" id="sceneScreen">
-    <div class="scene-header">場面を選んでください</div>
-    <div class="scene-list" id="sceneList">
-      <div class="scene-card" data-scene="solo">
-        <span class="sc-icon">🎻</span>
-        <div class="sc-title">ソロ・旋律</div>
-        <div class="sc-sub">無伴奏の単旋律。ピタゴラス律基準で華やかに</div>
-      </div>
-      <div class="scene-card" data-scene="double">
-        <span class="sc-icon">🎵</span>
-        <div class="sc-title">重音・和音</div>
-        <div class="sc-sub">純正律基準。1音ずつ分散和音で確認</div>
-      </div>
-      <div class="scene-card" data-scene="piano">
-        <span class="sc-icon">🎹</span>
-        <div class="sc-title">ピアノ伴奏</div>
-        <div class="sc-sub">平均律基準。ピアノと合わせるとき</div>
-      </div>
-      <div class="scene-card" data-scene="ensemble">
-        <span class="sc-icon">🎼</span>
-        <div class="sc-title">弦楽合奏</div>
-        <div class="sc-sub">旋律⇔和音を手動切替。弦楽四重奏など</div>
-      </div>
-      <div class="scene-card" data-scene="bach">
-        <span class="sc-icon">📜</span>
-        <div class="sc-title">バッハ無伴奏</div>
-        <div class="sc-sub">旋律⇔和音を手動切替。無伴奏ソナタ＆パルティータ</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Tuner Screen -->
+  <!-- Main Screen -->
   <div class="screen" id="mainScreen">
     <div class="header">
-      <button class="h-back" id="backBtn">← 場面選択</button>
-      <span class="h-scene" id="sceneTitle"></span>
+      <span class="h-title">音程チューナー</span>
       <button class="h-settings" id="settingsBtn">⚙</button>
     </div>
+
+    <!-- Mode Toggle -->
+    <div class="mode-row">
+      <button class="mode-btn active" data-mode="melody">
+        <span class="mode-label">旋律</span>
+        <span class="mode-sub">ピタゴラス</span>
+      </button>
+      <button class="mode-btn" data-mode="piano">
+        <span class="mode-label">平均律</span>
+        <span class="mode-sub">ピアノ</span>
+      </button>
+      <button class="mode-btn" data-mode="chord">
+        <span class="mode-label">和音</span>
+        <span class="mode-sub">純正律</span>
+      </button>
+    </div>
+
     <div class="content" id="mainContent">
-      <!-- Toggle (ensemble/bach only) -->
-      <div class="toggle-row" id="toggleRow" style="display:none">
-        <button class="toggle-btn active" data-ref="melody" id="togMelody">旋律</button>
-        <button class="toggle-btn" data-ref="chord" id="togChord">和音</button>
-      </div>
-      <!-- Zone Bar -->
+      <!-- Judgment + Zone Bar -->
       <div class="card">
+        <div class="judgment">
+          <div class="judgment-text j-silent" id="judgmentText">音を出してください</div>
+          <div class="judgment-sub" id="judgmentSub"></div>
+        </div>
         <canvas id="zoneCanvas"></canvas>
       </div>
+
       <!-- Note Display -->
       <div class="card">
-        <div id="noSound" class="no-sound">音を出してください</div>
+        <div id="noSound" class="no-sound" style="display:none"></div>
         <div id="noteDisplay" style="display:none">
           <div class="note-display">
             <div class="note-kana" id="noteKana"></div>
-            <div class="note-name" id="noteName"></div>
+            <div class="note-sci" id="noteSci"></div>
             <div class="note-interval" id="noteInterval"></div>
-            <div class="note-cents-row" id="noteCentsRow"></div>
+            <div class="ref-row" id="refRow"></div>
           </div>
         </div>
       </div>
+
       <!-- Staff -->
       <div class="card">
         <canvas id="staffCanvas"></canvas>
       </div>
+
       <!-- Learning Card -->
       <div id="learnCardArea"></div>
     </div>
@@ -241,11 +236,11 @@ html,body{
       </div>
     </div>
     <div class="setting-group">
-      <div class="setting-label">正解ゾーン幅</div>
+      <div class="setting-label">正解ゾーン バッファ幅</div>
       <div class="setting-options" id="zoneOptions">
-        <button class="setting-opt" data-val="4">±4 cent</button>
-        <button class="setting-opt active" data-val="7">±7 cent</button>
-        <button class="setting-opt" data-val="10">±10 cent</button>
+        <button class="setting-opt" data-val="4">±4c きびしい</button>
+        <button class="setting-opt active" data-val="7">±7c ふつう</button>
+        <button class="setting-opt" data-val="10">±10c やさしい</button>
       </div>
     </div>
     <div class="setting-group">
@@ -284,10 +279,9 @@ if(typeof CanvasRenderingContext2D.prototype.roundRect==='undefined'){
   };
 }
 
-// ===== SETTINGS (localStorage) =====
+// ===== SETTINGS =====
 var DEFAULTS={a4:442,zone:7,showCents:true,showInterval:true,showLearnCard:true};
 var settings=loadSettings();
-
 function loadSettings(){
   try{var s=JSON.parse(localStorage.getItem('proTunerSettings'));return Object.assign({},DEFAULTS,s);}
   catch(e){return Object.assign({},DEFAULTS);}
@@ -297,102 +291,123 @@ function saveSettings(){localStorage.setItem('proTunerSettings',JSON.stringify(s
 // ===== CONSTANTS =====
 var A4=settings.a4;
 
-// Chromatic note names (ET reference)
+// ── 音程データ（完全ルール集 準拠） ──
+// ji/pyth = ETからのセント偏差
+// 出典: 村上曜『弦楽器の音程』、Loosen(1993)、Casals理論
+var INTERVALS=[
+  {name:'完全1度',      ji:  0, pyth:  0, jiR:'1:1',   pythR:'1:1',     stable:true},
+  {name:'短2度',        ji: 12, pyth:-10, jiR:'16:15', pythR:'256:243', stable:false},
+  {name:'長2度',        ji:  4, pyth:  4, jiR:'9:8',   pythR:'9:8',     stable:true},
+  {name:'短3度',        ji: 16, pyth: -6, jiR:'6:5',   pythR:'32:27',   stable:false},
+  {name:'長3度',        ji:-14, pyth:  8, jiR:'5:4',   pythR:'81:64',   stable:false},
+  {name:'完全4度',      ji: -2, pyth: -2, jiR:'4:3',   pythR:'4:3',     stable:true},
+  {name:'増4度/減5度',  ji:-10, pyth: 12, jiR:'45:32', pythR:'729:512', stable:false},
+  {name:'完全5度',      ji:  2, pyth:  2, jiR:'3:2',   pythR:'3:2',     stable:true},
+  {name:'短6度',        ji: 14, pyth: -8, jiR:'8:5',   pythR:'128:81',  stable:false},
+  {name:'長6度',        ji:-16, pyth:  6, jiR:'5:3',   pythR:'27:16',   stable:false},
+  {name:'短7度',        ji: -4, pyth: -4, jiR:'16:9',  pythR:'16:9',    stable:true},
+  {name:'長7度',        ji:-12, pyth: 10, jiR:'15:8',  pythR:'243:128', stable:false}
+];
+
+// ── 音名 ──
 var NOTE_NAMES=[
-  {b:'C',a:'',k:'ド'},{b:'C',a:'♯',k:'ド♯'},{b:'D',a:'',k:'レ'},
-  {b:'D',a:'♯',k:'レ♯'},{b:'E',a:'',k:'ミ'},{b:'F',a:'',k:'ファ'},
-  {b:'F',a:'♯',k:'ファ♯'},{b:'G',a:'',k:'ソ'},{b:'G',a:'♯',k:'ソ♯'},
-  {b:'A',a:'',k:'ラ'},{b:'A',a:'♯',k:'ラ♯'},{b:'B',a:'',k:'シ'}
+  {b:'C', a:'',  k:'ド',         staff:0},
+  {b:'C', a:'♯', k:'ド♯/レ♭',   staff:0, sharp:true},
+  {b:'D', a:'',  k:'レ',         staff:1},
+  {b:'D', a:'♯', k:'レ♯/ミ♭',   staff:1, sharp:true},
+  {b:'E', a:'',  k:'ミ',         staff:2},
+  {b:'F', a:'',  k:'ファ',       staff:3},
+  {b:'F', a:'♯', k:'ファ♯/ソ♭', staff:3, sharp:true},
+  {b:'G', a:'',  k:'ソ',         staff:4},
+  {b:'G', a:'♯', k:'ソ♯/ラ♭',   staff:4, sharp:true},
+  {b:'A', a:'',  k:'ラ',         staff:5},
+  {b:'A', a:'♯', k:'ラ♯/シ♭',   staff:5, sharp:true},
+  {b:'B', a:'',  k:'シ',         staff:6}
 ];
 
-// Staff position: semitones from C -> staff position (C=0,D=1,E=2,F=3,G=4,A=5,B=6)
-var SEMI_TO_STAFF=[0,0,1,1,2,3,3,4,4,5,5,6];
-var STAFF_POS_Y=[0,1,2,3,4,5,6]; // C,D,E,F,G,A,B -> line/space index
-
-// Open strings (semitone index from C0)
+// ── 開放弦 (MIDI semitone) ──
 var OPEN_STRINGS=[
-  {name:'G',oct:3,semi:55,kana:'ソ',color:'#4f8cff'},  // G3
-  {name:'D',oct:4,semi:62,kana:'レ',color:'#f5a623'},  // D4
-  {name:'A',oct:4,semi:69,kana:'ラ',color:'#e74c3c'},  // A4
-  {name:'E',oct:5,semi:76,kana:'ミ',color:'#2ecc71'}   // E5
+  {name:'G', semi:55, kana:'ソ', color:'#4f8cff'},
+  {name:'D', semi:62, kana:'レ', color:'#f5a623'},
+  {name:'A', semi:69, kana:'ラ', color:'#e74c3c'},
+  {name:'E', semi:76, kana:'ミ', color:'#2ecc71'}
 ];
 
-// Interval names (semitones from open string)
-var INTERVAL_NAMES=[
-  '完全1度','短2度','長2度','短3度','長3度','完全4度',
-  '増4度/減5度','完全5度','短6度','長6度','短7度','長7度','完全8度',
-  '短9度','長9度','短10度','長10度','完全11度'
-];
-
-// Interval offsets in cents from ET
-// [chord(JI), piano(ET), melody(Pythagorean)]
-// Index = semitones from nearest lower open string
-var INTERVAL_OFFSETS=[
-  [0,0,0],          // 0: P1 — all same
-  [12,0,-10],       // 1: m2 — JI 16/15=+12, Pyth 256/243=-10
-  [4,0,4],          // 2: M2 — JI 9/8=+4, Pyth 9/8=+4
-  [16,0,6],         // 3: m3 — JI 6/5=+16, Pyth 32/27=+6
-  [-14,0,-8],       // 4: M3 — JI 5/4=-14, Pyth 81/64=-8 (Pyth high, JI low)
-  [-2,0,-2],        // 5: P4 — JI 4/3=-2, Pyth 4/3=-2
-  [-10,0,-6],       // 6: TT — JI 45/32=-10, Pyth 729/512=-6 (approx)
-  [2,0,2],          // 7: P5 — JI 3/2=+2, Pyth 3/2=+2
-  [14,0,-8],        // 8: m6 — JI 8/5=+14, Pyth=-8 (approx)
-  [-16,0,6],        // 9: M6 — JI 5/3=-16, Pyth=+6 (approx)
-  [18,0,-4],        // 10: m7 — JI 16/9=+18 (approx 7/4=-31), Pyth=-4
-  [-12,0,10],       // 11: M7 — JI 15/8=-12, Pyth=+10
-];
-
-// Scene definitions
-var SCENES={
-  solo:   {title:'ソロ・旋律',   ref:'melody', hasToggle:false},
-  double: {title:'重音・和音',   ref:'chord',  hasToggle:false},
-  piano:  {title:'ピアノ伴奏',   ref:'piano',  hasToggle:false},
-  ensemble:{title:'弦楽合奏',    ref:'melody', hasToggle:true},
-  bach:   {title:'バッハ無伴奏', ref:'melody', hasToggle:true}
-};
-
-// Ref index: chord=0, piano=1, melody=2
-var REF_INDEX={chord:0,piano:1,melody:2};
-var REF_LABELS={chord:'和音(純正律)',piano:'ピアノ(平均律)',melody:'旋律(ピタゴラス律)'};
-var REF_COLORS={chord:'#f5a623',piano:'#667',melody:'#4f8cff'};
-
-// ===== LEARNING CARDS =====
+// ── 学習カード ──
 var LEARN_CARDS=[
-  {id:'m3_ji',intervals:[3],refs:['chord'],text:'短3度は純正律だとETより16セント高め。響きの「うなり」が消える位置を探しましょう。'},
-  {id:'M3_ji',intervals:[4],refs:['chord'],text:'長3度は純正律ではETより14セント低い！ピアノの長3度とはかなり違います。'},
-  {id:'M3_solo',intervals:[4],refs:['melody'],text:'旋律の長3度はピタゴラス律でETより8セント低め。ソロでは少し高めに聞こえる方が華やか。'},
-  {id:'P5_pure',intervals:[7],refs:['chord','melody'],text:'完全5度はどの律でもETよりわずかに広い（+2セント）。開放弦と合わせて「うなり」ゼロを体感。'},
-  {id:'P4_pure',intervals:[5],refs:['chord','melody'],text:'完全4度はETよりわずかに狭い（-2セント）。5度の裏返しです。'},
-  {id:'m2_lead',intervals:[1],refs:['melody'],text:'短2度（導音の解決先）。ピタゴラス律では狭め（-10セント）、次の音へ強く引き寄せられます。'},
-  {id:'M7_lead',intervals:[11],refs:['melody'],text:'長7度は導音。ピタゴラス律では+10セント高め＝主音に近い。解決の引力を感じて。'},
-  {id:'piano_et',intervals:[3,4],refs:['piano'],text:'ピアノ伴奏では平均律に合わせます。純正律との「ずれ」を感じても、ここは妥協が正解。'},
-  {id:'P1_tune',intervals:[0],refs:['chord','melody','piano'],text:'ユニゾン/オクターブは全律共通。開放弦と完全に一致する「うなりゼロ」を目指しましょう。'},
-  {id:'m6_ji',intervals:[8],refs:['chord'],text:'短6度は純正律で+14セント。長3度の転回音程で、同じく純正律では大きなずれがあります。'},
-  {id:'M6_ji',intervals:[9],refs:['chord'],text:'長6度は純正律で-16セント。短3度の転回音程です。'},
-  {id:'tt_color',intervals:[6],refs:['melody'],text:'増4度/減5度（トライトーン）は文脈で音程が変わる特殊な音程。解決先を意識して。'},
-  {id:'ens_toggle',intervals:null,refs:null,scene:['ensemble'],text:'弦楽合奏では、旋律を弾くときと和音を弾くときで音程を切り替えます。上のトグルで切替を。'},
-  {id:'bach_toggle',intervals:null,refs:null,scene:['bach'],text:'バッハ無伴奏では和音→旋律が頻繁に交替します。和音は純正律、旋律はピタゴラス律が基本。'},
-  {id:'general_listen',intervals:null,refs:null,text:'音程は「正しい位置」より「響きを聴く」ことが大切。数値はあくまでガイドです。'},
+  {id:'M3_battle', iv:[4],
+   title:'長3度 ── 最大の戦場',
+   text:'純正律(5:4)=-14c、ピタゴラス(81:64)=+8c。差は22c（シントニック・コンマ）。和音では低く、旋律では高く取る。この22cを聴き分けられれば音程の9割は解決。'},
+  {id:'m3_reverse', iv:[3],
+   title:'短3度 ── 長3度と逆パターン',
+   text:'純正律(6:5)=+16c（高め）、ピタゴラス(32:27)=-6c（低め）。長3度と正反対に動く。和音では高く、旋律では低く取る。差はやはり22c。'},
+  {id:'M7_lead', iv:[11],
+   title:'長7度 ── 導音の引力',
+   text:'ピタゴラス律では+10c高めに取る。これが主音への「引力」を生む。プロのソロ演奏が表情豊かに聞こえる正体。Loosen(1993)でも確認済み。'},
+  {id:'m2_semitone', iv:[1],
+   title:'半音は2種類ある',
+   text:'旋律的半音(ピタゴラス)=90c（狭い）。和声的半音(純正律)=112c（広い）。差は22c。導音の解決は狭い半音（90c）で弾くと引力が最大に。'},
+  {id:'P5_anchor', iv:[7],
+   title:'完全5度 ── 不動のアンカー',
+   text:'3:2の振動数比。どの音律でもETから+2c。開放弦で常に確認できる最も安定した音程。調弦の基礎であり、全ての音程の出発点。'},
+  {id:'P4_invert', iv:[5],
+   title:'完全4度 ── 5度の裏返し',
+   text:'4:3の振動数比。どの律でもETから-2c。5度と合わせて「安定組」。意外と5度より合わせにくいのは、低い方の音が基準になりにくいから。'},
+  {id:'M6_pattern', iv:[9],
+   title:'長6度 ── 短3度の転回',
+   text:'純正律(5:3)=-16c、ピタゴラス(27:16)=+6c。短3度をひっくり返した音程で、数値も対称的。和音では低く、旋律では高く。'},
+  {id:'m6_pattern', iv:[8],
+   title:'短6度 ── 長3度の転回',
+   text:'純正律(8:5)=+14c、ピタゴラス(128:81)=-8c。長3度の転回。数値も長3度と対称。和音では高く、旋律では低く。'},
+  {id:'SC_unit', iv:[3,4,8,9,1,11],
+   title:'シントニック・コンマ = 22c = 3.6mm',
+   text:'旋律→和音に切り替えるとき、指を3.6mm（第1ポジション）ずらす。この距離がすべての音律切替の基本単位。覚えるべき最重要の数字。'},
+  {id:'stable_group', iv:[0,2,5,7,10],
+   title:'安定組 ── 迷わなくていい音程',
+   text:'完全1度・長2度・完全4度・完全5度・短7度。純正律とピタゴラスで同じ値。どの場面でも同じ位置で弾けばOK。戦場は長3度・短3度・6度・7度。'},
+  {id:'pattern_rule', iv:[3,4,8,9,1,11],
+   title:'法則: 長=旋律で広く、短=旋律で狭く',
+   text:'長音程・増音程は「旋律=高め、和音=低め」。短音程・減音程はその逆。差は常に約22c。これを知っていればどんな音程でも正解がわかる。'},
+  {id:'piano_math', iv:null, modes:['piano'],
+   title:'平均律 ── 数学的妥協',
+   text:'12音を2^(1/12)で等分。全ての音程がわずかにずれている代わりに、どの調でも同じように弾ける。ピアノは固定されているから、合わせるのがこちらの仕事。'},
+  {id:'math_is_all', iv:null,
+   title:'音は振動数の比',
+   text:'5:4の長3度は第5倍音が一致→「うなりゼロ」。81:64の長3度は倍音が微妙にずれ→「明るく推進力がある」。どちらも正解。違うのは場面だけ。'},
+  {id:'loosen', iv:null,
+   title:'研究: プロの耳は数学と一致',
+   text:'Loosen(1993): プロ8名の無伴奏演奏を測定→ピタゴラス音階に最も近い値を演奏。プロの「良い耳」の正体は、無意識の数学的最適化だった。'},
+  {id:'bow_7c', iv:null,
+   title:'弓圧だけで±7cずれる',
+   text:'弓圧・弓速の変化だけで±7cのピッチ変動が起きる（完全ルール集 G項）。弓を変えたら音程も微調整。これもプロが無意識にやっていること。'},
+  {id:'vibrato_48c', iv:null,
+   title:'ビブラートと音程',
+   text:'プロの平均ビブラート幅≈48c(約1/4音)。ビブラートは音程を「ごまかす」のではなく「表現する」もの。基準ピッチが正確でないとビブラートも不正確になる。'},
+  {id:'threshold_7c', iv:null,
+   title:'人間の許容限界 = 7c',
+   text:'7c以上ずれると「下手」に聞こえる。逆に7c以内なら「表現の範囲」。プロとアマの差はこの7cの中でどこを狙うかの精度。'},
+  {id:'practice_3step', iv:null,
+   title:'村上メソッド3段階',
+   text:'①脳内で音程をイメージ ②一発で指を配置（出してからずらさない）③実音を聴いて答え合わせ。ずれたら「何セントずれたか」を定量的に感じ取り、脳内地図を更新。'}
 ];
 
 // ===== STATE =====
 var audioCtx=null,analyser=null,audioBuf=null;
 var isRunning=false;
-var currentScreen='start'; // start, scene, main, settings
-var currentScene=null; // solo,double,piano,ensemble,bach
-var activeRef='melody'; // melody,chord,piano
+var currentScreen='start';
+var activeMode='melody'; // melody, piano, chord
 var smoothPitch=0,silCnt=0;
 var zoneCtx=null,staffCtx=null;
-var zW=0,zH=70,sW=0,sH=190;
-var lastDetected=null; // {semi,freq,octave,noteIdx,cents}
-var holdTimer=0,holdNote=-1; // for learning card trigger
-var shownCards={},cardCount={};
-var currentCard=null,cardFadeTimer=null;
+var zW=0,zH=80,sW=0,sH=180;
+var lastDet=null;
+var holdTimer=0,holdSemi=-1;
+var cardCount={},lastCardId=null;
+var cardFadeTimer=null;
 
 // ===== YIN =====
 function yin(buf,sr){
   var th=0.15,half=Math.floor(buf.length/2);
-  var tMin=Math.floor(sr/1100),tMax=Math.min(Math.ceil(sr/160),half);
+  var tMin=Math.floor(sr/2800),tMax=Math.min(Math.ceil(sr/170),half);
   var diff=new Float32Array(half);
   for(var t=0;t<tMax;t++){
     var s=0;
@@ -418,53 +433,67 @@ function yin(buf,sr){
 
 // ===== HELPERS =====
 function rms(buf){var s=0;for(var i=0;i<buf.length;i++)s+=buf[i]*buf[i];return Math.sqrt(s/buf.length);}
-function centsFromFreq(f,t){return 1200*Math.log2(f/t);}
-
-// Get ET frequency for a semitone index (A4=69)
+function centsFrom(f,t){return 1200*Math.log2(f/t);}
 function etFreq(semi){return A4*Math.pow(2,(semi-69)/12);}
 
-// Detect note from frequency
 function detectNote(freq){
   if(freq<=0)return null;
-  // Find nearest ET semitone
   var semi=Math.round(12*Math.log2(freq/A4)+69);
   var etF=etFreq(semi);
-  var centsOff=centsFromFreq(freq,etF);
+  var centsOff=centsFrom(freq,etF);
   var noteIdx=((semi%12)+12)%12;
   var octave=Math.floor(semi/12)-1;
-  // Find nearest open string below
-  var bestStr=null,bestDist=999;
+
+  // 最寄り開放弦
+  var bestStr=-1,bestDist=999;
   for(var i=0;i<OPEN_STRINGS.length;i++){
     var d=semi-OPEN_STRINGS[i].semi;
     if(d>=0&&d<bestDist){bestDist=d;bestStr=i;}
   }
-  // If above all strings by >18 semitones or below G3, try closest
-  if(bestStr===null||bestDist>18){
-    for(var i=0;i<OPEN_STRINGS.length;i++){
-      var d=Math.abs(semi-OPEN_STRINGS[i].semi);
-      if(d<bestDist){bestDist=d;bestStr=i;bestDist=semi-OPEN_STRINGS[i].semi;}
-    }
-  }
-  var intervalSemi=bestDist;
-  if(intervalSemi<0)intervalSemi=0;
-  if(intervalSemi>11)intervalSemi=intervalSemi%12;
+  if(bestStr<0){bestStr=0;bestDist=semi-OPEN_STRINGS[0].semi;}
+  var ivSemi=bestDist%12;
+
   return {
-    semi:semi,freq:freq,octave:octave,noteIdx:noteIdx,
-    centsFromET:centsOff,
-    openStr:bestStr,intervalSemi:intervalSemi,
-    etFreq:etF
+    semi:semi, freq:freq, octave:octave, noteIdx:noteIdx,
+    centsFromET:centsOff, etFreq:etF,
+    openStr:bestStr, ivSemi:ivSemi
   };
 }
 
-// Get the target offset for current ref and interval
-function getTargetOffset(intervalSemi,ref){
-  if(intervalSemi<0||intervalSemi>=INTERVAL_OFFSETS.length)return 0;
-  var ri=REF_INDEX[ref];
-  if(ri===undefined)ri=1;
-  return INTERVAL_OFFSETS[intervalSemi][ri];
+// Zone bounds for current mode
+function getZone(ivSemi){
+  var iv=INTERVALS[ivSemi];
+  var buf=settings.zone;
+  if(activeMode==='melody') return {center:iv.pyth, lo:iv.pyth-buf, hi:iv.pyth+buf};
+  if(activeMode==='chord')  return {center:iv.ji,   lo:iv.ji-buf,   hi:iv.ji+buf};
+  return {center:0, lo:-buf, hi:buf}; // piano
 }
 
-// ===== CANVAS HELPERS =====
+// Judge
+function judge(centsFromET,zone){
+  if(centsFromET>=zone.lo&&centsFromET<=zone.hi) return 'in';
+  var dist=centsFromET<zone.lo ? zone.lo-centsFromET : centsFromET-zone.hi;
+  if(dist<=7) return 'close';
+  return 'far';
+}
+
+// Position description
+function describePos(centsFromET,ivSemi){
+  var iv=INTERVALS[ivSemi];
+  if(iv.stable){
+    var d=Math.abs(centsFromET-iv.ji);
+    if(d<2) return 'ぴったり！';
+    return centsFromET>iv.ji ? 'やや高め' : 'やや低め';
+  }
+  var dJI=Math.abs(centsFromET-iv.ji);
+  var dET=Math.abs(centsFromET);
+  var dPy=Math.abs(centsFromET-iv.pyth);
+  if(dJI<=dET&&dJI<=dPy) return '純正律（和音）寄り';
+  if(dPy<=dET&&dPy<=dJI) return 'ピタゴラス（旋律）寄り';
+  return '平均律（ピアノ）付近';
+}
+
+// ===== CANVAS =====
 function dprCanvas(canvas,w,h){
   var dpr=window.devicePixelRatio||1;
   canvas.style.width=w+'px';
@@ -476,13 +505,13 @@ function dprCanvas(canvas,w,h){
   return ctx;
 }
 
-// ===== ZONE BAR DRAWING =====
+// ===== ZONE BAR =====
 function setupZone(){
   var c=document.getElementById('zoneCanvas');
   if(!c)return;
-  var pw=c.parentElement.clientWidth-36;
+  var pw=c.parentElement.clientWidth-32;
   zW=Math.max(pw,200);
-  zH=70;
+  zH=80;
   zoneCtx=dprCanvas(c,zW,zH);
   drawZone(null);
 }
@@ -492,125 +521,129 @@ function drawZone(det){
   var w=zW,h=zH;
   ctx.clearRect(0,0,w,h);
 
-  var mx=20,ml=mx,mr=w-mx,mw=mr-ml;
-  var cy=h*0.42,bh=5,cx=ml+mw/2;
-  var range=60; // ±60 cents displayed
+  var mx=16,ml=mx,mr=w-mx,mw=mr-ml;
+  var cy=h*0.40,bh=4,cx=ml+mw/2;
+  var range=50;
 
-  // Bar background
+  // Get interval data
+  var ivSemi=det?det.ivSemi:4; // default M3 for display
+  var iv=INTERVALS[ivSemi];
+
+  // Bar bg
   ctx.fillStyle='#1a1d32';
   ctx.beginPath();ctx.roundRect(ml,cy-bh/2,mw,bh,[bh/2]);ctx.fill();
 
-  // Get interval offsets for all 3 refs
-  var intervalSemi=det?det.intervalSemi:0;
-  var offsets=[
-    INTERVAL_OFFSETS[intervalSemi]?INTERVAL_OFFSETS[intervalSemi][0]:0,
-    INTERVAL_OFFSETS[intervalSemi]?INTERVAL_OFFSETS[intervalSemi][1]:0,
-    INTERVAL_OFFSETS[intervalSemi]?INTERVAL_OFFSETS[intervalSemi][2]:0
+  // Active zone highlight
+  var zone=getZone(ivSemi);
+  var zLoX=cx+(zone.lo/range)*(mw/2);
+  var zHiX=cx+(zone.hi/range)*(mw/2);
+  var modeCol=activeMode==='melody'?'#4f8cff':activeMode==='chord'?'#f5a623':'#778';
+  ctx.fillStyle=modeCol+'20';
+  ctx.beginPath();ctx.roundRect(zLoX,cy-20,zHiX-zLoX,40,[4]);ctx.fill();
+  // Zone border
+  ctx.strokeStyle=modeCol+'40';ctx.lineWidth=1;
+  ctx.beginPath();ctx.roundRect(zLoX,cy-20,zHiX-zLoX,40,[4]);ctx.stroke();
+
+  // Reference markers: [JI, ET, Pyth]
+  var refs=[
+    {off:iv.ji,   label:'和音', col:'#f5a623', sub:iv.jiR},
+    {off:0,       label:'ET',   col:'#667',    sub:''},
+    {off:iv.pyth, label:'旋律', col:'#4f8cff', sub:iv.pythR}
   ];
-  var refs=['chord','piano','melody'];
-  var refCols=[REF_COLORS.chord,REF_COLORS.piano,REF_COLORS.melody];
 
-  // Active ref index
-  var ari=REF_INDEX[activeRef];
+  for(var i=0;i<refs.length;i++){
+    var r=refs[i];
+    var rx=cx+(r.off/range)*(mw/2);
+    var isActive=(i===0&&activeMode==='chord')||(i===1&&activeMode==='piano')||(i===2&&activeMode==='melody');
 
-  // Draw correct zone (for active ref)
-  var zoneW=settings.zone;
-  var zoneCenter=offsets[ari];
-  var zcX=cx+zoneCenter/range*(mw/2);
-  var zwPx=zoneW/range*(mw/2);
-  ctx.fillStyle=REF_COLORS[activeRef]+'18';
-  ctx.beginPath();ctx.roundRect(zcX-zwPx,cy-18,zwPx*2,36,[4]);ctx.fill();
-
-  // Draw 3 reference markers
-  for(var i=0;i<3;i++){
-    var ox=cx+offsets[i]/range*(mw/2);
-    var isActive=i===ari;
-    ctx.strokeStyle=refCols[i];
-    ctx.lineWidth=isActive?2:1;
-    ctx.globalAlpha=isActive?1:0.4;
-    ctx.beginPath();ctx.moveTo(ox,cy-14);ctx.lineTo(ox,cy+14);ctx.stroke();
+    // Marker line
+    ctx.strokeStyle=r.col;
+    ctx.lineWidth=isActive?2.5:1;
+    ctx.globalAlpha=isActive?1:0.35;
+    ctx.beginPath();ctx.moveTo(rx,cy-16);ctx.lineTo(rx,cy+16);ctx.stroke();
     ctx.globalAlpha=1;
+
     // Label
-    ctx.fillStyle=refCols[i];
-    ctx.globalAlpha=isActive?0.8:0.3;
-    ctx.font='9px -apple-system,sans-serif';
+    ctx.fillStyle=r.col;
+    ctx.globalAlpha=isActive?0.9:0.3;
+    ctx.font=(isActive?'bold ':'')+' 9px -apple-system,sans-serif';
     ctx.textAlign='center';ctx.textBaseline='top';
-    var labels=['JI','ET','Pyth'];
-    ctx.fillText(labels[i],ox,cy+17);
+    ctx.fillText(r.label,rx,cy+19);
+    // Ratio below label (only if not ET and markers aren't too close)
+    if(r.sub&&!iv.stable){
+      ctx.font='8px -apple-system,sans-serif';
+      ctx.fillText(r.sub,rx,cy+30);
+    }
     ctx.globalAlpha=1;
   }
 
-  // Ticks
-  for(var t=-60;t<=60;t+=10){
-    if(t===0){
-      // Center tick (ET reference)
-    }
-    var x=ml+mw*(t+range)/(range*2);
-    ctx.strokeStyle='#262940';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(x,cy-4);ctx.lineTo(x,cy+4);ctx.stroke();
+  // SC annotation (if interval has 22c gap)
+  if(!iv.stable){
+    var scLoX=cx+(Math.min(iv.ji,iv.pyth)/range)*(mw/2);
+    var scHiX=cx+(Math.max(iv.ji,iv.pyth)/range)*(mw/2);
+    ctx.strokeStyle='#ffffff12';ctx.lineWidth=1;
+    ctx.setLineDash([3,3]);
+    var scY=cy-24;
+    ctx.beginPath();ctx.moveTo(scLoX,scY);ctx.lineTo(scHiX,scY);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#ffffff18';ctx.font='7px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText('SC 22c',(scLoX+scHiX)/2,scY-1);
   }
 
-  // Labels
-  ctx.fillStyle='#445';ctx.font='10px -apple-system,sans-serif';
+  // Tick marks
+  for(var t=-50;t<=50;t+=10){
+    var tx=ml+mw*(t+range)/(range*2);
+    ctx.strokeStyle=t===0?'#334':'#1e2138';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(tx,cy-3);ctx.lineTo(tx,cy+3);ctx.stroke();
+  }
+
+  // Edge labels
+  ctx.fillStyle='#334';ctx.font='9px -apple-system,sans-serif';
   ctx.textBaseline='bottom';
   ctx.textAlign='left';ctx.fillText('♭ 低い',ml,h-2);
   ctx.textAlign='right';ctx.fillText('♯ 高い',mr,h-2);
 
   if(!det)return;
 
-  // Detected pitch position: centsFromET relative to ET center
-  var centsPos=det.centsFromET;
-  var cl=Math.max(-range,Math.min(range,centsPos));
-  var ix=ml+mw*(cl+range)/(range*2);
+  // Pitch indicator
+  var cl=Math.max(-range,Math.min(range,det.centsFromET));
+  var ix=cx+(cl/range)*(mw/2);
 
-  // Determine color based on distance from active ref target
-  var distFromTarget=Math.abs(centsPos-zoneCenter);
-  var col=distFromTarget<=zoneW?'#2ecc71':distFromTarget<=zoneW*2?'#f5a623':'#e74c3c';
+  var jResult=judge(det.centsFromET,zone);
+  var col=jResult==='in'?'#2ecc71':jResult==='close'?'#f5a623':'#e74c3c';
 
   // Glow
-  var g=ctx.createRadialGradient(ix,cy,0,ix,cy,20);
+  var g=ctx.createRadialGradient(ix,cy,0,ix,cy,18);
   g.addColorStop(0,col+'55');g.addColorStop(1,col+'00');
-  ctx.fillStyle=g;ctx.fillRect(ix-20,cy-20,40,40);
+  ctx.fillStyle=g;ctx.fillRect(ix-18,cy-18,36,36);
 
-  // Indicator dot
+  // Dot
   ctx.beginPath();ctx.arc(ix,cy,6,0,Math.PI*2);
   ctx.fillStyle=col;ctx.fill();
   ctx.beginPath();ctx.arc(ix-1.5,cy-1.5,2,0,Math.PI*2);
   ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fill();
 }
 
-// ===== STAFF DRAWING =====
+// ===== STAFF =====
 var LS=14,HS=LS/2;
-
 function staffY(pos,bly){return bly-pos*HS;}
 
 function setupStaff(){
   var c=document.getElementById('staffCanvas');
   if(!c)return;
-  var pw=c.parentElement.clientWidth-36;
+  var pw=c.parentElement.clientWidth-32;
   sW=Math.max(pw,200);
-  sH=190;
+  sH=180;
   staffCtx=dprCanvas(c,sW,sH);
   drawStaff(null);
 }
 
-// Convert detected note to staff position
-// E4 = staffPos 0 (bottom line), F4=1, G4=2, A4=3, B4=4, C5=5, D5=6, E5=7, F5=8
 function noteToStaffPos(det){
   if(!det)return null;
-  var noteIdx=det.noteIdx;
-  var octave=det.octave;
-  var staffNote=SEMI_TO_STAFF[noteIdx]; // 0-6 for C-B
-  // Staff position relative to E4 (bottom line of treble clef)
-  // E4: noteIdx=4, oct=4 => staffPos=0
-  var pos=(octave-4)*7+staffNote-2; // E=2 in 0-indexed C=0
-  return pos;
-}
-
-function noteHasSharp(det){
-  if(!det)return false;
-  var a=NOTE_NAMES[det.noteIdx].a;
-  return a==='♯';
+  var staffNote=NOTE_NAMES[det.noteIdx].staff;
+  return (det.octave-4)*7+staffNote-2; // E4=0
 }
 
 function drawStaff(det){
@@ -620,26 +653,38 @@ function drawStaff(det){
   var sl=50,sr=sW-16;
   var bly=sH*0.72;
 
-  // 5 staff lines
   ctx.strokeStyle='#2a2d44';ctx.lineWidth=1;
   for(var i=0;i<5;i++){
     var y=bly-i*LS;
     ctx.beginPath();ctx.moveTo(sl,y);ctx.lineTo(sr,y);ctx.stroke();
   }
 
-  // Treble clef
-  drawClef(ctx,sl,bly);
+  // Clef
+  var fs=LS*5.8;
+  ctx.save();
+  ctx.font=fs+'px Times,serif';
+  ctx.fillStyle='#3a4060';
+  ctx.textBaseline='alphabetic';
+  var gLineY=bly-LS;
+  var tx=sl+4,ty=gLineY+fs*0.36;
+  var m=ctx.measureText('\uD834\uDD1E');
+  if(m.width>2) ctx.fillText('\uD834\uDD1E',tx,ty);
+  else{
+    ctx.font='bold '+(LS*1.5)+'px serif';
+    ctx.fillStyle='#334';ctx.textBaseline='middle';ctx.textAlign='center';
+    ctx.fillText('G',sl+20,gLineY);
+  }
+  ctx.restore();
 
   if(!det)return;
 
   var sp=noteToStaffPos(det);
   if(sp===null)return;
-
   var nx=(sl+sr)/2+8;
   var ny=staffY(sp,bly);
   var nr=HS*1.3;
 
-  // Ledger lines below staff (pos -2, -4, ...)
+  // Ledger lines below
   ctx.strokeStyle='#3a3d55';ctx.lineWidth=1;
   if(sp<0){
     for(var p=-2;p>=sp;p-=2){
@@ -647,7 +692,12 @@ function drawStaff(det){
       ctx.beginPath();ctx.moveTo(nx-nr*2,ly);ctx.lineTo(nx+nr*2,ly);ctx.stroke();
     }
   }
-  // Ledger lines above staff (pos 10, 12, ...)
+  // Middle C ledger (sp=-2)
+  if(sp===-1){
+    var ly=staffY(-2,bly);
+    // don't draw for -1, only if sp<= -2
+  }
+  // Ledger lines above
   if(sp>8){
     for(var p=10;p<=sp;p+=2){
       var ly=staffY(p,bly);
@@ -656,7 +706,7 @@ function drawStaff(det){
   }
 
   // Accidental
-  if(noteHasSharp(det)){
+  if(NOTE_NAMES[det.noteIdx].sharp){
     ctx.fillStyle='#aab';
     ctx.font='bold '+(LS*1.2)+'px -apple-system,sans-serif';
     ctx.textAlign='right';ctx.textBaseline='middle';
@@ -674,85 +724,138 @@ function drawStaff(det){
   var sh=LS*3.5;
   ctx.strokeStyle='#eef';ctx.lineWidth=1.5;
   ctx.beginPath();
-  if(sp<4){
-    ctx.moveTo(nx+nr*0.9,ny);ctx.lineTo(nx+nr*0.9,ny-sh);
-  }else{
-    ctx.moveTo(nx-nr*0.9,ny);ctx.lineTo(nx-nr*0.9,ny+sh);
-  }
+  if(sp<4){ctx.moveTo(nx+nr*0.9,ny);ctx.lineTo(nx+nr*0.9,ny-sh);}
+  else{ctx.moveTo(nx-nr*0.9,ny);ctx.lineTo(nx-nr*0.9,ny+sh);}
   ctx.stroke();
 }
 
-function drawClef(ctx,sl,bly){
-  var fs=LS*5.8;
-  ctx.save();
-  ctx.font=fs+'px Times,serif';
-  ctx.fillStyle='#3a4060';
-  ctx.textBaseline='alphabetic';
-  var gLineY=bly-LS;
-  var tx=sl+4;
-  var ty=gLineY+fs*0.36;
-  var m=ctx.measureText('\uD834\uDD1E');
-  if(m.width>2){
-    ctx.fillText('\uD834\uDD1E',tx,ty);
-  }else{
-    ctx.font='bold '+(LS*1.5)+'px serif';
-    ctx.fillStyle='#334';
-    ctx.textBaseline='middle';
-    ctx.textAlign='center';
-    ctx.fillText('G',sl+20,gLineY);
+// ===== DISPLAY UPDATE =====
+function updateDisplay(det){
+  if(currentScreen!=='main')return;
+
+  var jText=document.getElementById('judgmentText');
+  var jSub=document.getElementById('judgmentSub');
+  var noEl=document.getElementById('noSound');
+  var ndEl=document.getElementById('noteDisplay');
+
+  if(!det){
+    jText.textContent='音を出してください';
+    jText.className='judgment-text j-silent';
+    jSub.textContent='';
+    noEl.style.display='none';
+    ndEl.style.display='none';
+    lastDet=null;
+    drawZone(null);drawStaff(null);
+    return;
   }
-  ctx.restore();
+
+  lastDet=det;
+  noEl.style.display='none';
+  ndEl.style.display='block';
+
+  var iv=INTERVALS[det.ivSemi];
+  var zone=getZone(det.ivSemi);
+  var jResult=judge(det.centsFromET,zone);
+
+  // Judgment text
+  if(jResult==='in'){
+    var pos=describePos(det.centsFromET,det.ivSemi);
+    jText.textContent='正解ゾーン内！';
+    jText.className='judgment-text j-green';
+    jSub.textContent=pos;
+  }else if(jResult==='close'){
+    var dir=det.centsFromET<zone.lo;
+    jText.textContent='惜しい！ もう少し'+(dir?'高く':'低く');
+    jText.className='judgment-text j-yellow';
+    var dist=dir?zone.lo-det.centsFromET:det.centsFromET-zone.hi;
+    jSub.textContent=dist.toFixed(0)+'c '+(dir?'低い':'高い');
+  }else{
+    var dir=det.centsFromET<zone.lo;
+    jText.textContent=dir?'低い ↑':'高い ↓';
+    jText.className='judgment-text j-red';
+    var dist=dir?zone.lo-det.centsFromET:det.centsFromET-zone.hi;
+    jSub.textContent=dist.toFixed(0)+'c '+(dir?'低い':'高い');
+  }
+
+  // Note name
+  var nn=NOTE_NAMES[det.noteIdx];
+  document.getElementById('noteKana').textContent=nn.k;
+  document.getElementById('noteSci').textContent=nn.b+(nn.a||'')+det.octave+'  '+det.freq.toFixed(1)+'Hz';
+
+  // Interval
+  var intEl=document.getElementById('noteInterval');
+  if(settings.showInterval&&det.openStr>=0){
+    var os=OPEN_STRINGS[det.openStr];
+    intEl.innerHTML='<span class="ni-name">'+iv.name+'</span> <span class="ni-str">('+os.name+'線基準)</span>';
+    intEl.style.display='block';
+  }else{
+    intEl.style.display='none';
+  }
+
+  // Reference cents
+  var refEl=document.getElementById('refRow');
+  if(settings.showCents){
+    var refs=[
+      {label:'和音',off:iv.ji,col:'#f5a623',mode:'chord'},
+      {label:'ET',off:0,col:'#778',mode:'piano'},
+      {label:'旋律',off:iv.pyth,col:'#4f8cff',mode:'melody'}
+    ];
+    var h='';
+    for(var i=0;i<refs.length;i++){
+      var r=refs[i];
+      var diff=det.centsFromET-r.off;
+      var isAct=r.mode===activeMode;
+      h+='<div class="ref-item'+(isAct?' active':'')+'">';
+      h+='<span class="ri-label" style="color:'+(isAct?r.col:'#445')+'">'+r.label+'</span>';
+      h+='<span class="ri-val" style="color:'+(isAct?r.col:'#556')+'">'+(diff>=0?'+':'')+diff.toFixed(1)+'c</span>';
+      h+='</div>';
+    }
+    refEl.innerHTML=h;
+    refEl.style.display='flex';
+  }else{
+    refEl.style.display='none';
+  }
+
+  drawZone(det);
+  drawStaff(det);
+  tryShowLearnCard(det);
 }
 
-// ===== LEARNING CARD SYSTEM =====
+// ===== LEARNING CARDS =====
 function tryShowLearnCard(det){
-  if(!settings.showLearnCard)return;
-  if(!det)return;
+  if(!settings.showLearnCard||!det)return;
 
   var now=Date.now();
-  // Check hold time (0.5s)
-  if(det.semi===holdNote){
+  if(det.semi===holdSemi){
     if(now-holdTimer<500)return;
   }else{
-    holdNote=det.semi;holdTimer=now;return;
+    holdSemi=det.semi;holdTimer=now;return;
   }
 
-  // Find matching card
   for(var i=0;i<LEARN_CARDS.length;i++){
     var c=LEARN_CARDS[i];
-    // Check show count
+    if(c.id===lastCardId)continue;
     if((cardCount[c.id]||0)>=2)continue;
 
     var match=false;
-    // Scene-specific cards
-    if(c.scene){
-      if(c.scene.indexOf(currentScene)>=0)match=true;
-      else continue;
-    }
-    // Interval + ref match
-    if(c.intervals!==null&&c.refs!==null){
-      if(c.intervals.indexOf(det.intervalSemi)>=0&&c.refs.indexOf(activeRef)>=0)match=true;
-    }
-    // General cards (no interval/ref/scene filter)
-    if(c.intervals===null&&c.refs===null&&!c.scene){
-      // Show randomly with low probability
-      if(Math.random()<0.02)match=true;
-    }
+    if(c.iv!==null&&c.iv.indexOf(det.ivSemi)>=0) match=true;
+    if(c.modes&&c.modes.indexOf(activeMode)>=0) match=true;
+    if(c.iv===null&&!c.modes&&Math.random()<0.015) match=true;
 
-    if(match&&!shownCards[c.id+'_'+det.semi]){
-      showLearnCard(c,det.semi);
+    if(match){
+      showLearnCard(c);
       break;
     }
   }
 }
 
-function showLearnCard(card,semi){
-  shownCards[card.id+'_'+semi]=true;
+function showLearnCard(card){
   cardCount[card.id]=(cardCount[card.id]||0)+1;
-
+  lastCardId=card.id;
   var area=document.getElementById('learnCardArea');
-  area.innerHTML='<div class="learn-card" id="activeLearnCard">'+card.text+'</div>';
-  currentCard=card.id;
+  area.innerHTML='<div class="learn-card" id="activeLearnCard">'
+    +'<div class="lc-title">'+card.title+'</div>'
+    +card.text+'</div>';
 
   if(cardFadeTimer)clearTimeout(cardFadeTimer);
   cardFadeTimer=setTimeout(function(){
@@ -761,36 +864,8 @@ function showLearnCard(card,semi){
     setTimeout(function(){
       var el2=document.getElementById('activeLearnCard');
       if(el2)el2.remove();
-    },500);
-  },4000);
-}
-
-// ===== SCREEN NAVIGATION =====
-function showScreen(name){
-  currentScreen=name;
-  document.getElementById('startScreen').style.display=name==='start'?'flex':'none';
-  ['sceneScreen','mainScreen','settingsScreen'].forEach(function(id){
-    var el=document.getElementById(id);
-    el.classList.toggle('visible',id===name+'Screen');
-  });
-  if(name==='main'){
-    setTimeout(function(){setupZone();setupStaff();},30);
-  }
-}
-
-function selectScene(scene){
-  currentScene=scene;
-  var sc=SCENES[scene];
-  activeRef=sc.ref;
-  document.getElementById('sceneTitle').textContent=sc.title;
-  document.getElementById('toggleRow').style.display=sc.hasToggle?'flex':'none';
-  // Reset toggle state
-  if(sc.hasToggle){
-    activeRef='melody';
-    document.getElementById('togMelody').classList.add('active');
-    document.getElementById('togChord').classList.remove('active');
-  }
-  showScreen('main');
+    },600);
+  },5000);
 }
 
 // ===== AUDIO =====
@@ -820,7 +895,7 @@ async function startAudio(){
     audioBuf=new Float32Array(analyser.fftSize);
     isRunning=true;
 
-    showScreen('scene');
+    showScreen('main');
     tick();
   }catch(e){
     errEl.textContent=e.name==='NotAllowedError'
@@ -840,80 +915,26 @@ function tick(){
   }else{
     silCnt=0;
     var f=yin(audioBuf,audioCtx.sampleRate);
-    if(f>150&&f<2100){
-      if(smoothPitch===0||Math.abs(centsFromFreq(f,smoothPitch))>80)smoothPitch=f;
+    if(f>170&&f<3200){
+      if(smoothPitch===0||Math.abs(centsFrom(f,smoothPitch))>80)smoothPitch=f;
       else smoothPitch=smoothPitch*0.7+f*0.3;
-      var det=detectNote(smoothPitch);
-      updateDisplay(det);
+      updateDisplay(detectNote(smoothPitch));
     }
   }
   requestAnimationFrame(tick);
 }
 
-function updateDisplay(det){
-  if(currentScreen!=='main')return;
-
-  var ns=document.getElementById('noSound');
-  var nd=document.getElementById('noteDisplay');
-
-  if(!det){
-    ns.style.display='block';nd.style.display='none';
-    lastDetected=null;
-    drawZone(null);drawStaff(null);
-    return;
-  }
-
-  ns.style.display='none';nd.style.display='block';
-  lastDetected=det;
-
-  // Note name
-  var nn=NOTE_NAMES[det.noteIdx];
-  document.getElementById('noteKana').textContent=nn.k;
-  document.getElementById('noteName').textContent=nn.b+(nn.a||'')+det.octave;
-
-  // Interval
-  if(settings.showInterval&&det.openStr!==null){
-    var os=OPEN_STRINGS[det.openStr];
-    var intName=INTERVAL_NAMES[det.intervalSemi]||'';
-    document.getElementById('noteInterval').textContent=intName+'（'+os.name+'線基準）';
-    document.getElementById('noteInterval').style.display='block';
-  }else{
-    document.getElementById('noteInterval').style.display='none';
-  }
-
-  // Cents display
-  if(settings.showCents&&det.intervalSemi!==undefined){
-    var row=document.getElementById('noteCentsRow');
-    var h='';
-    var refList=[
-      {key:'chord',label:'和音'},
-      {key:'piano',label:'ET'},
-      {key:'melody',label:'旋律'}
-    ];
-    for(var i=0;i<refList.length;i++){
-      var rl=refList[i];
-      var off=getTargetOffset(det.intervalSemi,rl.key);
-      var dist=det.centsFromET-off;
-      var col=rl.key===activeRef?REF_COLORS[rl.key]:'#445';
-      h+='<div class="note-cent-item">';
-      h+='<span style="color:#556">'+rl.label+'</span>';
-      h+='<span class="cv" style="color:'+col+'">'+(dist>=0?'+':'')+dist.toFixed(1)+'c</span>';
-      h+='</div>';
-    }
-    row.innerHTML=h;
-    row.style.display='flex';
-  }else{
-    document.getElementById('noteCentsRow').style.display='none';
-  }
-
-  drawZone(det);
-  drawStaff(det);
-  tryShowLearnCard(det);
+// ===== SCREEN NAV =====
+function showScreen(name){
+  currentScreen=name;
+  document.getElementById('startScreen').style.display=name==='start'?'flex':'none';
+  document.getElementById('mainScreen').classList.toggle('visible',name==='main');
+  document.getElementById('settingsScreen').classList.toggle('visible',name==='settings');
+  if(name==='main') setTimeout(function(){setupZone();setupStaff();},30);
 }
 
 // ===== SETTINGS UI =====
 function initSettingsUI(){
-  // Pitch options
   document.querySelectorAll('#pitchOptions .setting-opt').forEach(function(b){
     b.classList.toggle('active',parseInt(b.dataset.val)===settings.a4);
     b.addEventListener('click',function(){
@@ -924,7 +945,6 @@ function initSettingsUI(){
       });
     });
   });
-  // Zone options
   document.querySelectorAll('#zoneOptions .setting-opt').forEach(function(b){
     b.classList.toggle('active',parseInt(b.dataset.val)===settings.zone);
     b.addEventListener('click',function(){
@@ -932,9 +952,9 @@ function initSettingsUI(){
       document.querySelectorAll('#zoneOptions .setting-opt').forEach(function(x){
         x.classList.toggle('active',parseInt(x.dataset.val)===settings.zone);
       });
+      if(lastDet)drawZone(lastDet);
     });
   });
-  // Switches
   setupSwitch('swCents','showCents');
   setupSwitch('swInterval','showInterval');
   setupSwitch('swLearnCard','showLearnCard');
@@ -953,37 +973,20 @@ function setupSwitch(id,key){
 // ===== EVENT LISTENERS =====
 document.getElementById('startBtn').addEventListener('click',startAudio);
 
-// Scene cards
-document.querySelectorAll('.scene-card').forEach(function(c){
-  c.addEventListener('click',function(){selectScene(c.dataset.scene);});
-});
-
-// Back button
-document.getElementById('backBtn').addEventListener('click',function(){
-  showScreen('scene');
+// Mode toggle
+document.querySelectorAll('.mode-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    activeMode=b.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(function(x){
+      x.classList.toggle('active',x.dataset.mode===activeMode);
+    });
+    if(lastDet){drawZone(lastDet);updateDisplay(lastDet);}
+  });
 });
 
 // Settings
-document.getElementById('settingsBtn').addEventListener('click',function(){
-  showScreen('settings');
-});
-document.getElementById('settingsBack').addEventListener('click',function(){
-  showScreen('main');
-});
-
-// Toggle melody/chord
-document.getElementById('togMelody').addEventListener('click',function(){
-  activeRef='melody';
-  document.getElementById('togMelody').classList.add('active');
-  document.getElementById('togChord').classList.remove('active');
-  if(lastDetected)drawZone(lastDetected);
-});
-document.getElementById('togChord').addEventListener('click',function(){
-  activeRef='chord';
-  document.getElementById('togChord').classList.add('active');
-  document.getElementById('togMelody').classList.remove('active');
-  if(lastDetected)drawZone(lastDetected);
-});
+document.getElementById('settingsBtn').addEventListener('click',function(){showScreen('settings');});
+document.getElementById('settingsBack').addEventListener('click',function(){showScreen('main');});
 
 // Resize
 window.addEventListener('resize',function(){
@@ -991,7 +994,6 @@ window.addEventListener('resize',function(){
   setupZone();setupStaff();
 });
 
-// Init
 initSettingsUI();
 
 })();
