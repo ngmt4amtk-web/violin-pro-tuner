@@ -69,6 +69,24 @@ html,body{
 .mode-btn[data-mode="chord"].active{background:#f5a62322;color:#f5a623}
 .mode-btn[data-mode="master"].active{background:#dde1;color:#dde}
 
+/* === Drone Row (chord mode) === */
+.drone-row{
+  display:flex;align-items:center;gap:6px;
+  margin:0 16px 8px;padding:10px 12px;
+  background:#12152a;border-radius:12px;border:1px solid #1e2140;
+}
+.drone-label{font-size:11px;color:#556;font-weight:600;flex-shrink:0;margin-right:2px}
+.drone-btn{
+  flex:1;padding:8px 4px;border-radius:10px;
+  font-size:16px;font-weight:700;line-height:1.2;
+  background:#0d0f1a;border:1.5px solid #222540;
+  color:#445;cursor:pointer;text-align:center;
+  font-family:inherit;transition:all .15s;
+}
+.drone-btn .db-hz{display:block;font-size:8px;font-weight:400;opacity:.5;margin-top:1px}
+.drone-btn.active{border-color:#f5a623;background:#f5a62318;color:#f5a623}
+.drone-btn.active .db-hz{opacity:.7}
+
 /* === Master Mode === */
 .master-hz{font-size:38px;font-weight:800;text-align:center;color:#dde;line-height:1}
 .master-et{font-size:14px;color:#778;text-align:center;margin-top:4px;font-weight:500}
@@ -207,6 +225,15 @@ html,body{
         <span class="mode-label">マスター</span>
         <span class="mode-sub">全数値</span>
       </button>
+    </div>
+
+    <!-- Drone Reference (chord mode only) -->
+    <div class="drone-row" id="droneRow" style="display:none">
+      <span class="drone-label">基準音</span>
+      <button class="drone-btn" data-str="0">G<span class="db-hz"></span></button>
+      <button class="drone-btn" data-str="1">D<span class="db-hz"></span></button>
+      <button class="drone-btn" data-str="2">A<span class="db-hz"></span></button>
+      <button class="drone-btn" data-str="3">E<span class="db-hz"></span></button>
     </div>
 
     <div class="content" id="mainContent">
@@ -427,7 +454,7 @@ var LEARN_CARDS=[
 var audioCtx=null,analyser=null,audioBuf=null;
 var isRunning=false;
 var currentScreen='start';
-var activeMode='melody'; // melody, piano, chord
+var activeMode='melody'; // melody, piano, chord, master
 var smoothPitch=0,silCnt=0;
 var zoneCtx=null,staffCtx=null;
 var zW=0,zH=80,sW=0,sH=180;
@@ -435,6 +462,67 @@ var lastDet=null;
 var holdTimer=0,holdSemi=-1;
 var cardCount={},lastCardId=null;
 var cardFadeTimer=null;
+
+// Drone
+var droneOsc=null,droneGain=null;
+var droneRef=-1; // index into OPEN_STRINGS, -1=off
+
+// Open string frequencies (pure 5th tuning from A4)
+var STR_RATIOS=[4/9, 2/3, 1, 3/2]; // G,D,A,E
+function openStringFreq(idx){return A4*STR_RATIOS[idx];}
+
+function startDrone(idx){
+  stopDrone();
+  if(!audioCtx)return;
+  droneRef=idx;
+  var freq=openStringFreq(idx);
+  droneOsc=audioCtx.createOscillator();
+  droneGain=audioCtx.createGain();
+  droneOsc.type='sine';
+  droneOsc.frequency.value=freq;
+  droneGain.gain.value=0.12;
+  droneOsc.connect(droneGain);
+  droneGain.connect(audioCtx.destination);
+  droneOsc.start();
+  updateDroneBtns();
+}
+
+function stopDrone(){
+  if(droneOsc){try{droneOsc.stop();}catch(e){}droneOsc.disconnect();droneOsc=null;}
+  if(droneGain){droneGain.disconnect();droneGain=null;}
+  droneRef=-1;
+  updateDroneBtns();
+}
+
+function updateDroneBtns(){
+  document.querySelectorAll('.drone-btn').forEach(function(b){
+    var i=parseInt(b.dataset.str);
+    b.classList.toggle('active',i===droneRef);
+    var hzEl=b.querySelector('.db-hz');
+    if(hzEl) hzEl.textContent=openStringFreq(i).toFixed(1)+'Hz';
+  });
+}
+
+// Detect note relative to a specific reference frequency (for chord mode)
+function detectFromRef(freq,strIdx){
+  if(freq<=0)return null;
+  var refFreq=openStringFreq(strIdx);
+  var centsFromRef=1200*Math.log2(freq/refFreq);
+  var semiInterval=Math.round(centsFromRef/100);
+  var ivSemi=((semiInterval%12)+12)%12;
+  var deviation=centsFromRef-semiInterval*100;
+
+  var semi=Math.round(12*Math.log2(freq/A4)+69);
+  var noteIdx=((semi%12)+12)%12;
+  var octave=Math.floor(semi/12)-1;
+  var etTarget=refFreq*Math.pow(2,semiInterval/12);
+
+  return {
+    semi:semi, freq:freq, octave:octave, noteIdx:noteIdx,
+    centsFromET:deviation, etFreq:etTarget,
+    openStr:strIdx, ivSemi:ivSemi
+  };
+}
 
 // ===== YIN =====
 function yin(buf,sr){
@@ -994,20 +1082,36 @@ async function startAudio(){
 
 function tick(){
   if(!isRunning)return;
-  analyser.getFloatTimeDomainData(audioBuf);
-  var r=rms(audioBuf);
-  if(r<0.01){
-    silCnt++;
-    if(silCnt>15){smoothPitch=0;updateDisplay(null);}
-  }else{
-    silCnt=0;
-    var f=yin(audioBuf,audioCtx.sampleRate);
-    if(f>170&&f<3200){
-      if(smoothPitch===0||Math.abs(centsFrom(f,smoothPitch))>80)smoothPitch=f;
-      else smoothPitch=smoothPitch*0.7+f*0.3;
-      updateDisplay(detectNote(smoothPitch));
+  try{
+    analyser.getFloatTimeDomainData(audioBuf);
+    var r=rms(audioBuf);
+    if(r<0.01){
+      silCnt++;
+      if(silCnt>15){smoothPitch=0;updateDisplay(null);}
+    }else{
+      silCnt=0;
+      var f=yin(audioBuf,audioCtx.sampleRate);
+      if(f>170&&f<3200){
+        // Drone avoidance: if drone is playing and detected freq is very close to drone, skip
+        if(droneRef>=0){
+          var dFreq=openStringFreq(droneRef);
+          if(Math.abs(centsFrom(f,dFreq))<15) f=-1; // likely picking up the drone
+        }
+        if(f>0){
+          if(smoothPitch===0||Math.abs(centsFrom(f,smoothPitch))>80)smoothPitch=f;
+          else smoothPitch=smoothPitch*0.7+f*0.3;
+          // Chord mode with reference: calculate from reference
+          var det;
+          if(activeMode==='chord'&&droneRef>=0){
+            det=detectFromRef(smoothPitch,droneRef);
+          }else{
+            det=detectNote(smoothPitch);
+          }
+          updateDisplay(det);
+        }
+      }
     }
-  }
+  }catch(e){}
   requestAnimationFrame(tick);
 }
 
@@ -1067,7 +1171,23 @@ document.querySelectorAll('.mode-btn').forEach(function(b){
     document.querySelectorAll('.mode-btn').forEach(function(x){
       x.classList.toggle('active',x.dataset.mode===activeMode);
     });
+    // Show/hide drone row
+    document.getElementById('droneRow').style.display=activeMode==='chord'?'flex':'none';
+    // Stop drone when leaving chord mode
+    if(activeMode!=='chord') stopDrone();
     if(lastDet){drawZone(lastDet);updateDisplay(lastDet);}
+  });
+});
+
+// Drone buttons
+document.querySelectorAll('.drone-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    var idx=parseInt(b.dataset.str);
+    if(droneRef===idx){
+      stopDrone(); // toggle off
+    }else{
+      startDrone(idx);
+    }
   });
 });
 
@@ -1081,7 +1201,20 @@ window.addEventListener('resize',function(){
   setupZone();setupStaff();
 });
 
+// iOS AudioContext resume on visibility change
+document.addEventListener('visibilitychange',function(){
+  if(audioCtx&&!document.hidden){
+    audioCtx.resume();
+  }
+});
+
+// iOS touch to resume
+document.addEventListener('touchstart',function(){
+  if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+},{passive:true});
+
 initSettingsUI();
+updateDroneBtns();
 
 })();
 </script>
