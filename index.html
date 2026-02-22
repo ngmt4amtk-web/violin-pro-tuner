@@ -71,21 +71,21 @@ html,body{
 
 /* === Drone Row (chord mode) === */
 .drone-row{
-  display:flex;align-items:center;gap:6px;
   margin:0 16px 8px;padding:10px 12px;
   background:#12152a;border-radius:12px;border:1px solid #1e2140;
 }
-.drone-label{font-size:11px;color:#556;font-weight:600;flex-shrink:0;margin-right:2px}
+.drone-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.drone-label{font-size:11px;color:#556;font-weight:600}
+.drone-info{font-size:11px;color:#f5a623;font-weight:500}
+.drone-grid{display:flex;flex-wrap:wrap;gap:4px}
 .drone-btn{
-  flex:1;padding:8px 4px;border-radius:10px;
-  font-size:16px;font-weight:700;line-height:1.2;
+  width:calc((100% - 20px)/6);padding:7px 2px;border-radius:8px;
+  font-size:13px;font-weight:700;line-height:1.2;
   background:#0d0f1a;border:1.5px solid #222540;
   color:#445;cursor:pointer;text-align:center;
   font-family:inherit;transition:all .15s;
 }
-.drone-btn .db-hz{display:block;font-size:8px;font-weight:400;opacity:.5;margin-top:1px}
 .drone-btn.active{border-color:#f5a623;background:#f5a62318;color:#f5a623}
-.drone-btn.active .db-hz{opacity:.7}
 
 /* === Master Mode === */
 .master-hz{font-size:38px;font-weight:800;text-align:center;color:#dde;line-height:1}
@@ -229,11 +229,24 @@ html,body{
 
     <!-- Drone Reference (chord mode only) -->
     <div class="drone-row" id="droneRow" style="display:none">
-      <span class="drone-label">基準音</span>
-      <button class="drone-btn" data-str="0">G<span class="db-hz"></span></button>
-      <button class="drone-btn" data-str="1">D<span class="db-hz"></span></button>
-      <button class="drone-btn" data-str="2">A<span class="db-hz"></span></button>
-      <button class="drone-btn" data-str="3">E<span class="db-hz"></span></button>
+      <div class="drone-header">
+        <span class="drone-label">基準音を選択</span>
+        <span class="drone-info" id="droneInfo"></span>
+      </div>
+      <div class="drone-grid">
+        <button class="drone-btn" data-note="0">C</button>
+        <button class="drone-btn" data-note="1">C♯</button>
+        <button class="drone-btn" data-note="2">D</button>
+        <button class="drone-btn" data-note="3">D♯</button>
+        <button class="drone-btn" data-note="4">E</button>
+        <button class="drone-btn" data-note="5">F</button>
+        <button class="drone-btn" data-note="6">F♯</button>
+        <button class="drone-btn" data-note="7">G</button>
+        <button class="drone-btn" data-note="8">G♯</button>
+        <button class="drone-btn" data-note="9">A</button>
+        <button class="drone-btn" data-note="10">A♯</button>
+        <button class="drone-btn" data-note="11">B</button>
+      </div>
     </div>
 
     <div class="content" id="mainContent">
@@ -465,17 +478,16 @@ var cardFadeTimer=null;
 
 // Drone
 var droneOsc=null,droneGain=null;
-var droneRef=-1; // index into OPEN_STRINGS, -1=off
-
-// Open string frequencies (pure 5th tuning from A4)
-var STR_RATIOS=[4/9, 2/3, 1, 3/2]; // G,D,A,E
-function openStringFreq(idx){return A4*STR_RATIOS[idx];}
+var droneRef=-1; // 0-11 chromatic note index, -1=off
+var DRONE_MIDI_BASE=60; // C4
+var DRONE_NAMES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+function droneFreqHz(idx){return A4*Math.pow(2,(DRONE_MIDI_BASE+idx-69)/12);}
 
 function startDrone(idx){
   stopDrone();
   if(!audioCtx)return;
   droneRef=idx;
-  var freq=openStringFreq(idx);
+  var freq=droneFreqHz(idx);
   droneOsc=audioCtx.createOscillator();
   droneGain=audioCtx.createGain();
   droneOsc.type='sine';
@@ -496,17 +508,23 @@ function stopDrone(){
 
 function updateDroneBtns(){
   document.querySelectorAll('.drone-btn').forEach(function(b){
-    var i=parseInt(b.dataset.str);
+    var i=parseInt(b.dataset.note);
     b.classList.toggle('active',i===droneRef);
-    var hzEl=b.querySelector('.db-hz');
-    if(hzEl) hzEl.textContent=openStringFreq(i).toFixed(1)+'Hz';
   });
+  var info=document.getElementById('droneInfo');
+  if(info){
+    if(droneRef>=0){
+      info.textContent=DRONE_NAMES[droneRef]+'4  '+droneFreqHz(droneRef).toFixed(1)+'Hz';
+    }else{
+      info.textContent='';
+    }
+  }
 }
 
-// Detect note relative to a specific reference frequency (for chord mode)
-function detectFromRef(freq,strIdx){
+// Detect note relative to drone reference (for chord mode)
+function detectFromRef(freq,droneIdx){
   if(freq<=0)return null;
-  var refFreq=openStringFreq(strIdx);
+  var refFreq=droneFreqHz(droneIdx);
   var centsFromRef=1200*Math.log2(freq/refFreq);
   var semiInterval=Math.round(centsFromRef/100);
   var ivSemi=((semiInterval%12)+12)%12;
@@ -520,7 +538,7 @@ function detectFromRef(freq,strIdx){
   return {
     semi:semi, freq:freq, octave:octave, noteIdx:noteIdx,
     centsFromET:deviation, etFreq:etTarget,
-    openStr:strIdx, ivSemi:ivSemi
+    openStr:-1, ivSemi:ivSemi, refName:DRONE_NAMES[droneIdx]
   };
 }
 
@@ -897,9 +915,9 @@ function updateDisplay(det){
     document.getElementById('mNoteKana').textContent=nn.k;
     document.getElementById('mNoteSci').textContent=nn.b+(nn.a||'')+det.octave;
     var mIntEl=document.getElementById('mNoteInterval');
-    if(det.openStr>=0){
-      var os=OPEN_STRINGS[det.openStr];
-      mIntEl.innerHTML='<span class="ni-name">'+iv.name+'</span> <span class="ni-str">('+os.name+'線基準)</span>';
+    var mRefLabel=det.refName?det.refName+'基準':det.openStr>=0?OPEN_STRINGS[det.openStr].name+'線基準':'';
+    if(mRefLabel){
+      mIntEl.innerHTML='<span class="ni-name">'+iv.name+'</span> <span class="ni-str">('+mRefLabel+')</span>';
       mIntEl.style.display='block';
     }else{
       mIntEl.style.display='none';
@@ -958,10 +976,14 @@ function updateDisplay(det){
 
     // Interval
     var intEl=document.getElementById('noteInterval');
-    if(settings.showInterval&&det.openStr>=0){
-      var os=OPEN_STRINGS[det.openStr];
-      intEl.innerHTML='<span class="ni-name">'+iv.name+'</span> <span class="ni-str">('+os.name+'線基準)</span>';
-      intEl.style.display='block';
+    if(settings.showInterval){
+      var refLabel=det.refName?det.refName+'基準':det.openStr>=0?OPEN_STRINGS[det.openStr].name+'線基準':'';
+      if(refLabel){
+        intEl.innerHTML='<span class="ni-name">'+iv.name+'</span> <span class="ni-str">('+refLabel+')</span>';
+        intEl.style.display='block';
+      }else{
+        intEl.style.display='none';
+      }
     }else{
       intEl.style.display='none';
     }
@@ -1094,7 +1116,7 @@ function tick(){
       if(f>170&&f<3200){
         // Drone avoidance: if drone is playing and detected freq is very close to drone, skip
         if(droneRef>=0){
-          var dFreq=openStringFreq(droneRef);
+          var dFreq=droneFreqHz(droneRef);
           if(Math.abs(centsFrom(f,dFreq))<15) f=-1; // likely picking up the drone
         }
         if(f>0){
@@ -1182,7 +1204,7 @@ document.querySelectorAll('.mode-btn').forEach(function(b){
 // Drone buttons
 document.querySelectorAll('.drone-btn').forEach(function(b){
   b.addEventListener('click',function(){
-    var idx=parseInt(b.dataset.str);
+    var idx=parseInt(b.dataset.note);
     if(droneRef===idx){
       stopDrone(); // toggle off
     }else{
