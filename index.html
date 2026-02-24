@@ -87,6 +87,24 @@ html,body{
 }
 .drone-btn.active{border-color:#f5a623;background:#f5a62318;color:#f5a623}
 
+/* === Key Row (key selection) === */
+.key-row{
+  margin:0 16px 8px;padding:10px 12px;
+  background:#12152a;border-radius:12px;border:1px solid #1e2140;
+}
+.key-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.key-label{font-size:11px;color:#556;font-weight:600}
+.key-info{font-size:11px;color:#4f8cff;font-weight:500}
+.key-grid{display:flex;flex-wrap:wrap;gap:4px}
+.key-btn{
+  width:calc((100% - 20px)/6);padding:7px 2px;border-radius:8px;
+  font-size:13px;font-weight:700;line-height:1.2;
+  background:#0d0f1a;border:1.5px solid #222540;
+  color:#445;cursor:pointer;text-align:center;
+  font-family:inherit;transition:all .15s;
+}
+.key-btn.active{border-color:#4f8cff;background:#4f8cff18;color:#4f8cff}
+
 /* === Master Mode === */
 .master-hz{font-size:38px;font-weight:800;text-align:center;color:#dde;line-height:1}
 .master-et{font-size:14px;color:#778;text-align:center;margin-top:4px;font-weight:500}
@@ -227,6 +245,28 @@ html,body{
       </button>
     </div>
 
+    <!-- Key Selection (melody/master modes) -->
+    <div class="key-row" id="keyRow">
+      <div class="key-header">
+        <span class="key-label">調</span>
+        <span class="key-info" id="keyInfo"></span>
+      </div>
+      <div class="key-grid">
+        <button class="key-btn" data-key="0">C</button>
+        <button class="key-btn" data-key="1">D♭</button>
+        <button class="key-btn" data-key="2">D</button>
+        <button class="key-btn" data-key="3">E♭</button>
+        <button class="key-btn" data-key="4">E</button>
+        <button class="key-btn" data-key="5">F</button>
+        <button class="key-btn" data-key="6">F♯</button>
+        <button class="key-btn" data-key="7">G</button>
+        <button class="key-btn" data-key="8">A♭</button>
+        <button class="key-btn" data-key="9">A</button>
+        <button class="key-btn" data-key="10">B♭</button>
+        <button class="key-btn" data-key="11">B</button>
+      </div>
+    </div>
+
     <!-- Drone Reference (chord mode only) -->
     <div class="drone-row" id="droneRow" style="display:none">
       <div class="drone-header">
@@ -352,7 +392,7 @@ if(typeof CanvasRenderingContext2D.prototype.roundRect==='undefined'){
 }
 
 // ===== SETTINGS =====
-var DEFAULTS={a4:442,zone:7,showCents:true,showInterval:true,showLearnCard:true};
+var DEFAULTS={a4:442,zone:7,showCents:true,showInterval:true,showLearnCard:true,key:2};
 var settings=loadSettings();
 function loadSettings(){
   try{var s=JSON.parse(localStorage.getItem('proTunerSettings'));return Object.assign({},DEFAULTS,s);}
@@ -404,6 +444,41 @@ var OPEN_STRINGS=[
   {name:'A', semi:69, kana:'ラ', color:'#e74c3c'},
   {name:'E', semi:76, kana:'ミ', color:'#2ecc71'}
 ];
+
+// ── 調（5度チェーン位置） ──
+var KEYS=[
+  {name:'C',  pos:0},  {name:'D♭', pos:-5}, {name:'D',  pos:2},
+  {name:'E♭', pos:-3}, {name:'E',  pos:4},  {name:'F',  pos:-1},
+  {name:'F♯', pos:6},  {name:'G',  pos:1},  {name:'A♭', pos:-4},
+  {name:'A',  pos:3},  {name:'B♭', pos:-2}, {name:'B',  pos:5}
+];
+var selectedKey=KEYS[settings.key!==undefined?settings.key:2];
+
+// 5度チェーン上の位置（幹音は固定、派生音は調の中心に近い方）
+//                        C    C#   D    D#   E    F    F#   G    G#   A    A#   B
+var CHAIN_NATURAL =      [0,   null,2,   null,4,   -1,  null,1,   null,3,   null,5];
+var CHAIN_SHARP =        [null,7,   null,9,   null,null,6,   null,8,   null,10,  null];
+var CHAIN_FLAT  =        [null,-5,  null,-3,  null,null,-6,  null,-4,  null,-2,  null];
+
+function getChainPos(semi){
+  if(CHAIN_NATURAL[semi]!==null) return CHAIN_NATURAL[semi];
+  var center=selectedKey.pos+2;
+  var sp=CHAIN_SHARP[semi],fp=CHAIN_FLAT[semi];
+  return Math.abs(sp-center)<=Math.abs(fp-center)?sp:fp;
+}
+
+function getPythOffset(det){
+  var noteSemi=det.noteIdx;
+  var refSemi;
+  if(activeMode==='chord'&&droneRef>=0){
+    refSemi=droneRef;
+  }else if(det.openStr>=0){
+    refSemi=OPEN_STRINGS[det.openStr].semi%12;
+  }else{
+    refSemi=0;
+  }
+  return (getChainPos(noteSemi)-getChainPos(refSemi))*2;
+}
 
 // ── 学習カード ──
 var LEARN_CARDS=[
@@ -599,11 +674,14 @@ function detectNote(freq){
 }
 
 // Zone bounds for current mode
-function getZone(ivSemi){
+function getZone(ivSemi,det){
   var iv=INTERVALS[ivSemi];
   var buf=settings.zone;
   if(activeMode==='master') return null; // no zone in master mode
-  if(activeMode==='melody') return {center:iv.pyth, lo:iv.pyth-buf, hi:iv.pyth+buf};
+  if(activeMode==='melody'){
+    var pyOff=det?getPythOffset(det):iv.pyth;
+    return {center:pyOff, lo:pyOff-buf, hi:pyOff+buf};
+  }
   if(activeMode==='chord')  return {center:iv.ji,   lo:iv.ji-buf,   hi:iv.ji+buf};
   return {center:0, lo:-buf, hi:buf}; // piano
 }
@@ -618,7 +696,7 @@ function judge(centsFromET,zone){
 }
 
 // Position description
-function describePos(centsFromET,ivSemi){
+function describePos(centsFromET,ivSemi,pythOff){
   var iv=INTERVALS[ivSemi];
   if(iv.stable){
     var d=Math.abs(centsFromET-iv.ji);
@@ -627,7 +705,7 @@ function describePos(centsFromET,ivSemi){
   }
   var dJI=Math.abs(centsFromET-iv.ji);
   var dET=Math.abs(centsFromET);
-  var dPy=Math.abs(centsFromET-iv.pyth);
+  var dPy=Math.abs(centsFromET-pythOff);
   if(dJI<=dET&&dJI<=dPy) return '純正律（和音）寄り';
   if(dPy<=dET&&dPy<=dJI) return 'ピタゴラス（旋律）寄り';
   return '平均律（ピアノ）付近';
@@ -674,7 +752,7 @@ function drawZone(det){
   ctx.beginPath();ctx.roundRect(ml,cy-bh/2,mw,bh,[bh/2]);ctx.fill();
 
   // Active zone highlight
-  var zone=getZone(ivSemi);
+  var zone=getZone(ivSemi,det);
   var isMaster=activeMode==='master';
   if(zone){
     var zLoX=cx+(zone.lo/range)*(mw/2);
@@ -687,10 +765,11 @@ function drawZone(det){
   }
 
   // Reference markers: [JI, ET, Pyth]
+  var pythOff=det?getPythOffset(det):iv.pyth;
   var refs=[
-    {off:iv.ji,   label:'和音', col:'#f5a623', sub:iv.jiR},
-    {off:0,       label:'ET',   col:'#667',    sub:''},
-    {off:iv.pyth, label:'旋律', col:'#4f8cff', sub:iv.pythR}
+    {off:iv.ji,    label:'和音', col:'#f5a623', sub:iv.jiR},
+    {off:0,        label:'ET',   col:'#667',    sub:''},
+    {off:pythOff,  label:'旋律', col:'#4f8cff', sub:iv.pythR}
   ];
 
   for(var i=0;i<refs.length;i++){
@@ -718,18 +797,21 @@ function drawZone(det){
     ctx.globalAlpha=1;
   }
 
-  // SC annotation (if interval has 22c gap)
+  // SC annotation (gap between JI and Pythagorean)
   if(!iv.stable){
-    var scLoX=cx+(Math.min(iv.ji,iv.pyth)/range)*(mw/2);
-    var scHiX=cx+(Math.max(iv.ji,iv.pyth)/range)*(mw/2);
-    ctx.strokeStyle='#ffffff12';ctx.lineWidth=1;
-    ctx.setLineDash([3,3]);
-    var scY=cy-24;
-    ctx.beginPath();ctx.moveTo(scLoX,scY);ctx.lineTo(scHiX,scY);ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#ffffff18';ctx.font='7px -apple-system,sans-serif';
-    ctx.textAlign='center';ctx.textBaseline='bottom';
-    ctx.fillText('SC 22c',(scLoX+scHiX)/2,scY-1);
+    var scGap=Math.round(Math.abs(pythOff-iv.ji));
+    if(scGap>2){
+      var scLoX=cx+(Math.min(iv.ji,pythOff)/range)*(mw/2);
+      var scHiX=cx+(Math.max(iv.ji,pythOff)/range)*(mw/2);
+      ctx.strokeStyle='#ffffff12';ctx.lineWidth=1;
+      ctx.setLineDash([3,3]);
+      var scY=cy-24;
+      ctx.beginPath();ctx.moveTo(scLoX,scY);ctx.lineTo(scHiX,scY);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#ffffff18';ctx.font='7px -apple-system,sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText(scGap+'c',(scLoX+scHiX)/2,scY-1);
+    }
   }
 
   // Tick marks
@@ -900,7 +982,7 @@ function updateDisplay(det){
   lastDet=det;
   var iv=INTERVALS[det.ivSemi];
   var nn=NOTE_NAMES[det.noteIdx];
-  var zone=getZone(det.ivSemi);
+  var zone=getZone(det.ivSemi,det);
   var jResult=judge(det.centsFromET,zone);
 
   if(isMaster){
@@ -924,8 +1006,9 @@ function updateDisplay(det){
     }
 
     // Master table: show all 3 systems
+    var pythOff=getPythOffset(det);
     var systems=[
-      {name:'旋律',sub:'ピタゴラス '+iv.pythR, off:iv.pyth, col:'#4f8cff'},
+      {name:'旋律',sub:'ピタゴラス '+iv.pythR, off:pythOff, col:'#4f8cff'},
       {name:'平均律',sub:'ET', off:0, col:'#778'},
       {name:'和音',sub:'純正律 '+iv.jiR, off:iv.ji, col:'#f5a623'}
     ];
@@ -952,7 +1035,7 @@ function updateDisplay(det){
 
     // Judgment text
     if(jResult==='in'){
-      var pos=describePos(det.centsFromET,det.ivSemi);
+      var pos=describePos(det.centsFromET,det.ivSemi,getPythOffset(det));
       jText.textContent='正解ゾーン内！';
       jText.className='judgment-text j-green';
       jSub.textContent=pos;
@@ -991,10 +1074,11 @@ function updateDisplay(det){
     // Reference cents
     var refEl=document.getElementById('refRow');
     if(settings.showCents){
+      var pythOff=getPythOffset(det);
       var refs=[
         {label:'和音',off:iv.ji,col:'#f5a623',mode:'chord'},
         {label:'ET',off:0,col:'#778',mode:'piano'},
-        {label:'旋律',off:iv.pyth,col:'#4f8cff',mode:'melody'}
+        {label:'旋律',off:pythOff,col:'#4f8cff',mode:'melody'}
       ];
       var rh='';
       for(var i=0;i<refs.length;i++){
@@ -1193,8 +1277,9 @@ document.querySelectorAll('.mode-btn').forEach(function(b){
     document.querySelectorAll('.mode-btn').forEach(function(x){
       x.classList.toggle('active',x.dataset.mode===activeMode);
     });
-    // Show/hide drone row
+    // Show/hide drone row and key row
     document.getElementById('droneRow').style.display=activeMode==='chord'?'flex':'none';
+    document.getElementById('keyRow').style.display=activeMode==='piano'?'none':'block';
     // Stop drone when leaving chord mode
     if(activeMode!=='chord') stopDrone();
     if(lastDet){drawZone(lastDet);updateDisplay(lastDet);}
@@ -1212,6 +1297,27 @@ document.querySelectorAll('.drone-btn').forEach(function(b){
     }
   });
 });
+
+// Key buttons
+document.querySelectorAll('.key-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    var idx=parseInt(b.dataset.key);
+    selectedKey=KEYS[idx];
+    settings.key=idx;
+    saveSettings();
+    updateKeyBtns();
+    if(lastDet){drawZone(lastDet);updateDisplay(lastDet);}
+  });
+});
+
+function updateKeyBtns(){
+  var idx=KEYS.indexOf(selectedKey);
+  document.querySelectorAll('.key-btn').forEach(function(b){
+    b.classList.toggle('active',parseInt(b.dataset.key)===idx);
+  });
+  var info=document.getElementById('keyInfo');
+  if(info) info.textContent=selectedKey.name+' dur';
+}
 
 // Settings
 document.getElementById('settingsBtn').addEventListener('click',function(){showScreen('settings');});
@@ -1237,6 +1343,7 @@ document.addEventListener('touchstart',function(){
 
 initSettingsUI();
 updateDroneBtns();
+updateKeyBtns();
 
 })();
 </script>
