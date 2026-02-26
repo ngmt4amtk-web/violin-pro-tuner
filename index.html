@@ -619,7 +619,7 @@ function detectFromRef(freq,droneIdx){
 
 // ===== YIN =====
 function yin(buf,sr){
-  var th=0.15,half=Math.floor(buf.length/2);
+  var th=0.20,half=Math.floor(buf.length/2);
   var tMin=Math.floor(sr/2800),tMax=Math.min(Math.ceil(sr/170),half);
   var diff=new Float32Array(half);
   for(var t=0;t<tMax;t++){
@@ -1171,7 +1171,7 @@ async function startAudio(){
     });
     var src=audioCtx.createMediaStreamSource(stream);
     analyser=audioCtx.createAnalyser();
-    analyser.fftSize=4096;
+    analyser.fftSize=8192;
     src.connect(analyser);
     audioBuf=new Float32Array(analyser.fftSize);
     isRunning=true;
